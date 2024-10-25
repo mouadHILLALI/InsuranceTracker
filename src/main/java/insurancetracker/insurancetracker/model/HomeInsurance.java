@@ -19,7 +19,16 @@ public class HomeInsurance extends Insurance {
     @ManyToOne
     private User user;
     public HomeInsurance() {}
-
+    public HomeInsurance(String PolicyHolderName , LocalDate startDate , LocalDate endDate , double propertyValue , boolean isHouse, boolean hasSecuritySystem, boolean isInRiskZone , User user) {
+        this.PolicyHolderName = PolicyHolderName;
+        this.startDate = startDate;
+        this.endDate = endDate;
+        this.PropertyValue = propertyValue;
+        this.isHouse = isHouse;
+        this.hasSecuritySystem = hasSecuritySystem;
+        this.isInRiskZone = isInRiskZone;
+        this.user = user;
+    }
     public double getPropertyValue() {
         return PropertyValue;
     }
