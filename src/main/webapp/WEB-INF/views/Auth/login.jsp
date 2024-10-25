@@ -1,3 +1,4 @@
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <!DOCTYPE html>
 <html lang="en">
@@ -5,7 +6,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Insurance Tracker - Login</title>
-    <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-gray-100">
@@ -34,7 +34,7 @@
 <section class="flex items-center justify-center py-20">
     <div class="bg-white p-8 rounded-lg shadow-lg max-w-md w-full">
         <h2 class="text-3xl font-semibold text-center text-blue-600 mb-6">Login to Your Account</h2>
-        <form action="/login" method="post" class="space-y-6">
+        <form action="/Auth/login" method="post" class="space-y-6">
             <div>
                 <label for="email" class="block text-sm font-medium text-gray-700">Email</label>
                 <div class="mt-1">
@@ -49,6 +49,9 @@
                            class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500" />
                 </div>
             </div>
+            <c:if test="${not empty error}">
+                <p style="color:red">${error}</p>
+            </c:if>
             <div class="flex items-center justify-between">
                 <div class="flex items-center">
                     <input id="remember_me" name="remember_me" type="checkbox"
