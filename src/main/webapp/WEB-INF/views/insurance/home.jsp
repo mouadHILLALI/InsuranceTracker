@@ -35,7 +35,7 @@
         <h2 class="text-2xl font-bold mb-6 text-gray-700">Manage Your Home Insurance</h2>
 
         <!-- Form for Home Insurance Management -->
-        <form action="/home-insurance/create" method="post" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <form action="/insurance/createHome" method="post" class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <!-- Insurance Policy Number -->
             <div>
                 <label for="policyHolderName" class="block text-sm font-medium text-gray-700">Policy Holder Name :</label>
