@@ -2,6 +2,8 @@ package insurancetracker.insurancetracker.controller;
 
 import insurancetracker.insurancetracker.model.*;
 import insurancetracker.insurancetracker.service.InsuranceService.CarInsuranceServices;
+import insurancetracker.insurancetracker.service.InsuranceService.HealthInsuranceServices;
+import insurancetracker.insurancetracker.service.InsuranceService.HomeInsuranceServices;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -15,6 +17,10 @@ import java.time.LocalDate;
 public class InsuranceController {
     @Autowired
     private CarInsuranceServices carInsuranceServices;
+    @Autowired
+    private HealthInsuranceServices healthInsuranceServices;
+    @Autowired
+    private HomeInsuranceServices homeInsuranceServices;
     @GetMapping("/health")
     public String healthInsurance(Model model) {
         model.addAttribute("healthInsurance", new HealthInsurance());
@@ -58,7 +64,36 @@ public class InsuranceController {
             throw new RuntimeException(ex);
             }
     }
-    @PostMapping("createHealth")
+
+    @PostMapping("/createHome")
+    public String createInsurance( @RequestParam(name = "PolicyHolderName") String PolicyHolderName ,
+                                   @RequestParam(name = "startDate") LocalDate startDate ,
+                                   @RequestParam(name = "endDate") LocalDate endDate ,
+                                   @RequestParam(name = "PropertyValue") double PropertyValue,
+                                   @RequestParam(name = "isHouse") String isHouse,
+                                   @RequestParam(name = "hasSecuritySystem") String hasSecuritySystem,
+                                   @RequestParam(name = "isInRiskZone") String isInRiskZone , HttpSession session){
+
+        try {
+            User user = (User) session.getAttribute("user");
+            boolean hasSecurity = hasSecuritySystem.equals("yes") ? true : false;
+            boolean isHous = isHouse.equals("yes") ? true : false;
+            boolean isInRisk = isInRiskZone.equals("yes") ? true : false;
+            HomeInsurance homeInusrance = new HomeInsurance(PolicyHolderName , startDate , endDate ,PropertyValue,
+                    isHous , hasSecurity , isInRisk ,user);
+            homeInusrance = homeInsuranceServices.create(homeInusrance);
+            if (homeInusrance != null){
+                return "redirect:/Auth/client";
+            }else{
+                return "redirect:/insurance/home";
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "redirect:/insurance/home";
+        }
+    }
+
+    @PostMapping("/createHealth")
     public String createInsurance(
             @RequestParam(name = "PolicyHolderName") String PolicyHolderName ,
             @RequestParam(name = "startDate") LocalDate startDate ,
@@ -70,9 +105,17 @@ public class InsuranceController {
     ){
         try {
             User user = (User) session.getAttribute("user");
+            boolean hasChronic = hasChronicCondition.equals("yes") ? true : false;
+            HealthInsurance healthInsurance = new HealthInsurance (PolicyHolderName ,startDate , endDate , age , CoverageType , hasChronic  , user );
+            healthInsurance = healthInsuranceServices.createHealthInsurance(healthInsurance);
+            if (healthInsurance != null) {
+                return "redirect:/Auth/client";
+            }else{
+                return "redirect:/insurance/health";
+            }
+
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
-        return "insurance/health";
     }
 }

@@ -1,6 +1,7 @@
 package insurancetracker.insurancetracker.model;
 
 import jakarta.persistence.*;
+import org.springframework.validation.annotation.Validated;
 
 import java.time.LocalDate;
 
@@ -17,7 +18,15 @@ public class HealthInsurance extends Insurance {
     private User user;
 
     public HealthInsurance() {}
-
+    public HealthInsurance(String PolicyHolderName , LocalDate startDate, LocalDate endDate , int age, String coverageType , boolean hasChronicCondition, User user) {
+        this.PolicyHolderName = PolicyHolderName;
+        this.startDate = startDate;
+        this.endDate = endDate;
+        this.age = age;
+        this.CoverageType = coverageType;
+        this.user = user;
+        this.hasChronicCondition = hasChronicCondition;
+    }
     public int getAge() {
         return age;
     }
