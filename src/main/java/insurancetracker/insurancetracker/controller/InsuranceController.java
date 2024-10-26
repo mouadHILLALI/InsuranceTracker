@@ -1,5 +1,6 @@
 package insurancetracker.insurancetracker.controller;
 
+import insurancetracker.insurancetracker.dtos.CarInsuranceDto;
 import insurancetracker.insurancetracker.model.*;
 import insurancetracker.insurancetracker.service.InsuranceService.CarInsuranceServices;
 import insurancetracker.insurancetracker.service.InsuranceService.HealthInsuranceServices;
@@ -51,14 +52,20 @@ public class InsuranceController {
         try {
             boolean isPro = isProfessionalUse.equals("yes") ? true : false;
             boolean hasAcc = hasAccidents.equals("yes") ? true : false;
-            User user = (User) session.getAttribute("user");
-            AutoInsurance autoInsurance = new AutoInsurance(PolicyHolderName , startDate, endDate , DriverAge , VehiculeType ,isPro , hasAcc ,user);
-            AutoInsurance insurance =  carInsuranceServices.create(autoInsurance);
-            if (insurance != null) {
-                return "redirect:/Auth/client";
-            }else{
-                return "redirect:/insurance/car";
-            }
+//          User user = (User) session.getAttribute("user");
+//          AutoInsurance autoInsurance = new AutoInsurance(PolicyHolderName , startDate, endDate , DriverAge , VehiculeType ,isPro , hasAcc ,user);
+            CarInsuranceDto carInsuranceDto = new CarInsuranceDto(PolicyHolderName,startDate,endDate,DriverAge,VehiculeType,isPro,hasAcc);
+            double total = carInsuranceServices.qouteCalc(carInsuranceDto);
+            model.addAttribute("carInsurance", carInsuranceDto);
+            model.addAttribute("total", total);
+            return "insurance/carQuote";
+//            autoInsurance =  carInsuranceServices.create(autoInsurance);
+
+//            if (autoInsurance != null) {
+//                return "redirect:/Auth/client";
+//            }else{
+//                return "redirect:/insurance/car";
+//            }
 
             } catch (Exception ex) {
             throw new RuntimeException(ex);
