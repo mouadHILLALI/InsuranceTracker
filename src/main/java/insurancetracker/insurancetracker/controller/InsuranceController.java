@@ -1,7 +1,12 @@
 package insurancetracker.insurancetracker.controller;
 
 import insurancetracker.insurancetracker.dtos.CarInsuranceDto;
+import insurancetracker.insurancetracker.dtos.ContractDto;
+import insurancetracker.insurancetracker.dtos.HealthInsuranceDto;
+import insurancetracker.insurancetracker.dtos.HomeInsuranceDto;
 import insurancetracker.insurancetracker.model.*;
+import insurancetracker.insurancetracker.repository.ContractRepository;
+import insurancetracker.insurancetracker.service.ContractService.ContractServices;
 import insurancetracker.insurancetracker.service.InsuranceService.CarInsuranceServices;
 import insurancetracker.insurancetracker.service.InsuranceService.HealthInsuranceServices;
 import insurancetracker.insurancetracker.service.InsuranceService.HomeInsuranceServices;
@@ -10,7 +15,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
 import java.time.LocalDate;
 
 @Controller
@@ -22,6 +29,8 @@ public class InsuranceController {
     private HealthInsuranceServices healthInsuranceServices;
     @Autowired
     private HomeInsuranceServices homeInsuranceServices;
+    @Autowired
+    private ContractServices contractServices;
     @GetMapping("/health")
     public String healthInsurance(Model model) {
         model.addAttribute("healthInsurance", new HealthInsurance());
@@ -40,36 +49,76 @@ public class InsuranceController {
         return "insurance/home";
     }
     @PostMapping("/createCar")
-    public String createInsurance(@RequestParam(name = "PolicyHolderName") String PolicyHolderName ,
-                                  @RequestParam(name = "startDate") LocalDate startDate ,
-                                  @RequestParam(name = "endDate") LocalDate endDate ,
-                                  @RequestParam(name = "DriverAge") int DriverAge ,
-                                  @RequestParam(name = "VehiculeType") String VehiculeType ,
-                                  @RequestParam(name = "isProfessionalUse") String isProfessionalUse ,
+    public String createInsurance(@RequestParam(name = "PolicyHolderName") String policyHolderName,
+                                  @RequestParam(name = "startDate") LocalDate startDate,
+                                  @RequestParam(name = "endDate") LocalDate endDate,
+                                  @RequestParam(name = "DriverAge") int driverAge,
+                                  @RequestParam(name = "VehiculeType") String vehiculeType,
+                                  @RequestParam(name = "isProfessionalUse") String isProfessionalUse,
                                   @RequestParam(name = "hasAccidents") String hasAccidents,
-                                  HttpSession session
-            , Model model) {
+                                  HttpSession session, Model model) {
         try {
-            boolean isPro = isProfessionalUse.equals("yes") ? true : false;
-            boolean hasAcc = hasAccidents.equals("yes") ? true : false;
-//          User user = (User) session.getAttribute("user");
-//          AutoInsurance autoInsurance = new AutoInsurance(PolicyHolderName , startDate, endDate , DriverAge , VehiculeType ,isPro , hasAcc ,user);
-            CarInsuranceDto carInsuranceDto = new CarInsuranceDto(PolicyHolderName,startDate,endDate,DriverAge,VehiculeType,isPro,hasAcc);
+            boolean isPro = Boolean.parseBoolean(isProfessionalUse);
+            boolean hasAcc = Boolean.parseBoolean(hasAccidents);
+            CarInsuranceDto carInsuranceDto = new CarInsuranceDto(policyHolderName, startDate, endDate, driverAge, vehiculeType, isPro, hasAcc);
             double total = carInsuranceServices.qouteCalc(carInsuranceDto);
-            model.addAttribute("carInsurance", carInsuranceDto);
-            model.addAttribute("total", total);
+            session.setAttribute("carInsuranceDto", carInsuranceDto);
+            session.setAttribute("total", total);
             return "insurance/carQuote";
-//            autoInsurance =  carInsuranceServices.create(autoInsurance);
+        } catch (Exception ex) {
+            System.err.println("Error creating insurance: " + ex.getMessage());
+            model.addAttribute("error", "An error occurred while creating the insurance. Please try again.");
+            return "Auth/client";
+        }
+    }
 
-//            if (autoInsurance != null) {
-//                return "redirect:/Auth/client";
-//            }else{
-//                return "redirect:/insurance/car";
-//            }
-
-            } catch (Exception ex) {
-            throw new RuntimeException(ex);
+    @PostMapping("/carQoute")
+    public String handleQoute(Model model , @RequestParam(name = "resp") String resp , HttpSession session) {
+        try {
+            if (resp.equals("approve")){
+                model.addAttribute("type" , "car");
+                double total = (double) session.getAttribute("total");
+                model.addAttribute("total", total);
+                return "Contract/contract";
+            } else if (resp.equals("reject")) {
+                return "insurance/car";
             }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return "insurance/car";
+    }
+    @PostMapping("/homeQoute")
+    public String handleHomeQoute(Model model , @RequestParam(name = "resp") String resp , HttpSession session) {
+        try {
+            if (resp.equals("approve")){
+                model.addAttribute("type" , "home");
+                double total = (double) session.getAttribute("total");
+                model.addAttribute("total", total);
+                return "Contract/contract";
+            } else if (resp.equals("reject")) {
+                return "insurance/home";
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return "insurance/home";
+    }
+    @PostMapping("/healthQoute")
+    public String handleHealthQoute(Model model , @RequestParam(name = "resp") String resp , HttpSession session) {
+        try {
+            if (resp.equals("approve")){
+                model.addAttribute("type" , "health");
+                double total = (double) session.getAttribute("total");
+                model.addAttribute("total", total);
+                return "Contract/contract";
+            } else if (resp.equals("reject")) {
+                return "insurance/health";
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return "insurance/health";
     }
 
     @PostMapping("/createHome")
@@ -86,14 +135,12 @@ public class InsuranceController {
             boolean hasSecurity = hasSecuritySystem.equals("yes") ? true : false;
             boolean isHous = isHouse.equals("yes") ? true : false;
             boolean isInRisk = isInRiskZone.equals("yes") ? true : false;
-            HomeInsurance homeInusrance = new HomeInsurance(PolicyHolderName , startDate , endDate ,PropertyValue,
+            HomeInsuranceDto homeInusrance = new HomeInsuranceDto(PolicyHolderName , startDate , endDate ,PropertyValue,
                     isHous , hasSecurity , isInRisk ,user);
-            homeInusrance = homeInsuranceServices.create(homeInusrance);
-            if (homeInusrance != null){
-                return "redirect:/Auth/client";
-            }else{
-                return "redirect:/insurance/home";
-            }
+            session.setAttribute("homeInsurance" , homeInusrance);
+            double homeTotal = homeInsuranceServices.calc(homeInusrance);
+            session.setAttribute("total", homeTotal);
+           return "insurance/homeQoute";
         } catch (Exception e) {
             e.printStackTrace();
             return "redirect:/insurance/home";
@@ -112,17 +159,42 @@ public class InsuranceController {
     ){
         try {
             User user = (User) session.getAttribute("user");
-            boolean hasChronic = hasChronicCondition.equals("yes") ? true : false;
-            HealthInsurance healthInsurance = new HealthInsurance (PolicyHolderName ,startDate , endDate , age , CoverageType , hasChronic  , user );
-            healthInsurance = healthInsuranceServices.createHealthInsurance(healthInsurance);
-            if (healthInsurance != null) {
-                return "redirect:/Auth/client";
-            }else{
-                return "redirect:/insurance/health";
-            }
-
+            boolean hasChronicConditio = hasChronicCondition.equals("yes") ? true : false;
+            HealthInsuranceDto healthInsuranceDto = new HealthInsuranceDto(PolicyHolderName , startDate , endDate ,age,
+                    CoverageType , hasChronicConditio , user);
+            session.setAttribute("healthInsurance" , healthInsuranceDto);
+            double healthTotal = healthInsuranceServices.calc(healthInsuranceDto);
+            session.setAttribute("total", healthTotal);
+            return "insurance/healthQoute";
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            e.printStackTrace();
+            return "redirect:/insurance/health";
         }
+    }
+
+    @PostMapping("/contract")
+    public String contract(Model model , @RequestParam(name = "total") double total ,@RequestParam(name = "insuranceType") String type, HttpSession session) {
+        try {
+            switch (type){
+                case "car":
+                    CarInsuranceDto carInsuranceDto = (CarInsuranceDto) session.getAttribute("carInsuranceDto");
+                    AutoInsurance caInsurance = carInsuranceServices.create(carInsuranceDto , session);
+                    ContractDto contractDto = new ContractDto("file" ,caInsurance );
+                    boolean flag = contractServices.addCarContract(contractDto ,caInsurance, total);
+                    System.out.println(flag);
+                    if (caInsurance!=null&&flag){
+                        return "redirect:/Auth/client";
+                    }else{
+                        return "redirect:/insurance/contract";
+                    }
+                case "home":
+                    break;
+                case "health":
+                    break;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return "insurance/carQuote";
     }
 }
