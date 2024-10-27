@@ -3,7 +3,9 @@ package insurancetracker.insurancetracker.service.InsuranceService;
 import insurancetracker.insurancetracker.dtos.CarInsuranceDto;
 import insurancetracker.insurancetracker.helpers.MonthsCalculator;
 import insurancetracker.insurancetracker.model.AutoInsurance;
+import insurancetracker.insurancetracker.model.User;
 import insurancetracker.insurancetracker.repository.InsuranceRepository;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -14,9 +16,12 @@ public class CarInsuranceServices {
     @Autowired
     private MonthsCalculator monthsCalculator;
     final double base = 500 ;
-    public AutoInsurance create(AutoInsurance insurance) {
+    public AutoInsurance create(CarInsuranceDto carInsuranceDto , HttpSession session) {
         try {
-            return insuranceRepository.save(insurance);
+            User user = (User) session.getAttribute("user");
+            AutoInsurance autoInsurance = new AutoInsurance(carInsuranceDto.policyHolderName() , carInsuranceDto.startDate() ,carInsuranceDto.endDate() ,carInsuranceDto.driverAge() ,
+                    carInsuranceDto.vehicleType() , carInsuranceDto.isProfessional() , carInsuranceDto.hasAccidents() ,user );
+            return insuranceRepository.save(autoInsurance);
         } catch (Exception e) {
             e.printStackTrace();
             return null;
@@ -51,12 +56,5 @@ public class CarInsuranceServices {
             return 0;
         }
     }
-    public boolean validateData(CarInsuranceDto carInsuranceDto){
-        try {
 
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-        return false;
-    }
 }
