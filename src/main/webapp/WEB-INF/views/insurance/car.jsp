@@ -1,3 +1,4 @@
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <html lang="en">
 <head>
@@ -29,7 +30,7 @@
   </div>
 </nav>
 
-<!-- Car Insurance Management Section -->
+<h1>${error ? error : null}</h1>
 <div class="container mx-auto mt-8">
   <div class="bg-white p-6 rounded-lg shadow-lg">
     <h2 class="text-2xl font-bold mb-6 text-gray-700">Manage Your Car Insurance</h2>
@@ -105,27 +106,24 @@
       <tr>
         <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Policy Number</th>
         <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Car Model</th>
-        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Registration Number</th>
-        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Amount (MAD)</th>
         <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Expiry Date</th>
+        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Amount (MAD)</th>
         <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
       </tr>
       </thead>
       <tbody class="bg-white divide-y divide-gray-200">
-      <!-- Example Row -->
-      <tr>
-        <td class="px-6 py-4 whitespace-nowrap">CAR12345</td>
-        <td class="px-6 py-4 whitespace-nowrap">Toyota Corolla</td>
-        <td class="px-6 py-4 whitespace-nowrap">AB123CD</td>
-        <td class="px-6 py-4 whitespace-nowrap">500,000 MAD</td>
-        <td class="px-6 py-4 whitespace-nowrap">2024-12-31</td>
-        <td class="px-6 py-4 whitespace-nowrap">
-          <a href="/car-insurance/edit/CAR12345" class="text-blue-600 hover:underline">Edit</a> |
-          <a href="/car-insurance/delete/CAR12345" class="text-red-600 hover:underline">Delete</a>
-        </td>
-      </tr>
-      <!-- End Example Row -->
-      <!-- More policies will be rendered here dynamically -->
+      <c:forEach var="insurance" items="${user.carInsurance}">
+        <tr>
+          <td class="px-6 py-4 whitespace-nowrap">${insurance.policyNumber}</td>
+          <td class="px-6 py-4 whitespace-nowrap">${insurance.vehiculeType}</td>
+          <td class="px-6 py-4 whitespace-nowrap">${insurance.endDate}</td>
+          <td class="px-6 py-4 whitespace-nowrap">${insurance.contract.total}</td>
+          <td class="px-6 py-4 whitespace-nowrap">
+            <a href="/car-insurance/edit/${insurance.policyNumber}" class="text-blue-600 hover:underline">Edit</a> |
+            <a href="/car-insurance/delete/${insurance.policyNumber}" class="text-red-600 hover:underline">Delete</a>
+          </td>
+        </tr>
+      </c:forEach>
       </tbody>
     </table>
   </div>
