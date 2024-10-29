@@ -12,7 +12,7 @@ public class HealthInsurance extends Insurance {
     private boolean hasChronicCondition;
     @Column(nullable = false)
     private String CoverageType;
-    @OneToOne
+    @OneToOne(fetch = FetchType.EAGER)
     private Contract contract;
     @ManyToOne
     private User user;

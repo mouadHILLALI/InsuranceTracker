@@ -103,18 +103,18 @@
             <tr>
                 <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Policy Number</th>
                 <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Amount (MAD)</th>
-                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Property Address</th>
+                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Property value</th>
                 <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Expiry Date</th>
                 <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
             </tr>
             </thead>
             <tbody class="bg-white divide-y divide-gray-200">
-            <c:forEach var="insurance" items="${user.carInsurance}">
+            <c:forEach var="insurance" items="${user.homeInsurances}">
                 <tr>
                     <td class="px-6 py-4 whitespace-nowrap">${insurance.policyNumber}</td>
-                    <td class="px-6 py-4 whitespace-nowrap">${insurance.vehiculeType}</td>
+                    <td class="px-6 py-4 whitespace-nowrap">${insurance.contract.total}DH</td>
+                    <td class="px-6 py-4 whitespace-nowrap">${insurance.propertyValue}DH</td>
                     <td class="px-6 py-4 whitespace-nowrap">${insurance.endDate}</td>
-                    <td class="px-6 py-4 whitespace-nowrap">${insurance.contract.Total}</td>
                     <td class="px-6 py-4 whitespace-nowrap">
                         <a href="/car-insurance/edit/${insurance.policyNumber}" class="text-blue-600 hover:underline">Edit</a> |
                         <a href="/car-insurance/delete/${insurance.policyNumber}" class="text-red-600 hover:underline">Delete</a>
