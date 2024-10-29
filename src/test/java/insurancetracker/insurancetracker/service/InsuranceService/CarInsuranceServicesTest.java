@@ -1,5 +1,6 @@
 package insurancetracker.insurancetracker.service.InsuranceService;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import org.junit.Before;
 
@@ -24,5 +25,9 @@ public class CarInsuranceServicesTest {
         CarInsuranceDto carInsuranceDto = new CarInsuranceDto("mouad", LocalDate.EPOCH, LocalDate.now(), 45, "lux", true, true);
         double quote = carInsuranceServices.qouteCalc(carInsuranceDto);
         assertNotNull(quote);
+    }
+    @Test
+    public void validate(){
+
     }
 }

@@ -82,30 +82,12 @@ public class AuthController {
     @GetMapping("/client")
     public String getClient(HttpSession session, Model model) {
         User user = (User) session.getAttribute("user");
-        int activeInsurances = user.getCarInsurance().size() + user.getHomeInsurances().size() + user.getHealthInsurance().size();
+        int activeInsurances = userServices.activeInsurance(user);
         session.setAttribute("activeInsurances", activeInsurances);
-        long totalContracts = user.getHomeInsurances().stream()
-                .filter(homeInsurance -> homeInsurance.getContract() != null)
-                .count()
-                + user.getCarInsurance().stream()
-                .filter(insurance -> insurance.getContract() != null)
-                .count()
-                + user.getHealthInsurance().stream()
-                .filter(insurance -> insurance.getContract() != null)
-                .count();
+        long totalContracts = userServices.getTotalContracts(user);
         session.setAttribute("totalContracts", totalContracts);
-        double totalPremium = user.getHomeInsurances().stream()
-                .filter(homeInsurance -> homeInsurance.getContract() != null)
-                .mapToDouble(homeInsurance -> homeInsurance.getContract().getTotal())
-                .sum()
-                + user.getCarInsurance().stream()
-                .filter(insurance -> insurance.getContract() != null)
-                .mapToDouble(insurance -> insurance.getContract().getTotal())
-                .sum()
-                + user.getHealthInsurance().stream()
-                .filter(insurance -> insurance.getContract() != null)
-                .mapToDouble(insurance -> insurance.getContract().getTotal())
-                .sum();        session.setAttribute("totalPremium", totalPremium);
+        double totalPremium = userServices.totalPremium(user);
+        session.setAttribute("totalPremium", totalPremium);
         if (user != null) {
             model.addAttribute("user", user);
             return "Client/client";

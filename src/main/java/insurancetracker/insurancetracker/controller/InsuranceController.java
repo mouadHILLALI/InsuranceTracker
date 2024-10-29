@@ -32,7 +32,9 @@ public class InsuranceController {
     @Autowired
     private ContractServices contractServices;
     @GetMapping("/health")
-    public String healthInsurance(Model model) {
+    public String healthInsurance(Model model , HttpSession session) {
+        User user = (User) session.getAttribute("user");
+        model.addAttribute("user", user);
         model.addAttribute("healthInsurance", new HealthInsurance());
         return "insurance/health";
     }
@@ -44,7 +46,9 @@ public class InsuranceController {
         return "insurance/car";
     }
     @GetMapping("/home")
-    public String homeInsurance(Model model) {
+    public String homeInsurance(Model model , HttpSession session) {
+        User user = (User) session.getAttribute("user");
+        model.addAttribute("user", user);
         model.addAttribute("homeInsurance", new HomeInsurance());
         return "insurance/home";
     }

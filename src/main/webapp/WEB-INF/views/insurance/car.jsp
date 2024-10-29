@@ -117,7 +117,7 @@
           <td class="px-6 py-4 whitespace-nowrap">${insurance.policyNumber}</td>
           <td class="px-6 py-4 whitespace-nowrap">${insurance.vehiculeType}</td>
           <td class="px-6 py-4 whitespace-nowrap">${insurance.endDate}</td>
-          <td class="px-6 py-4 whitespace-nowrap">${insurance.contract.total}</td>
+          <td class="px-6 py-4 whitespace-nowrap">${insurance.contract.Total}</td>
           <td class="px-6 py-4 whitespace-nowrap">
             <a href="/car-insurance/edit/${insurance.policyNumber}" class="text-blue-600 hover:underline">Edit</a> |
             <a href="/car-insurance/delete/${insurance.policyNumber}" class="text-red-600 hover:underline">Delete</a>
