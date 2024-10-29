@@ -47,7 +47,6 @@
         <input type="hidden" name="PolicyHolderName" value="${user.name}">
       </div>
 
-      <!-- Car Model -->
       <div>
         <label for="startDate" class="block text-sm font-medium text-gray-700">Start Date :</label>
         <input type="date" id="startDate" name="startDate" required
@@ -72,7 +71,6 @@
                class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
       </div>
 
-      <!-- Policy Expiry Date -->
       <div>
       <label>Is the car for professional use?</label>
         <input type="radio" id="professionalYes" name="isProfessionalUse" value="yes">
@@ -88,7 +86,6 @@
         <label for="accidentsNo">No</label>
       </div>
 
-      <!-- Submit Button -->
       <div class="col-span-2 text-right">
         <button type="submit"
                 class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg shadow-md transition duration-300">
@@ -98,7 +95,6 @@
     </form>
   </div>
 
-  <!-- Existing Car Insurance Policies Table -->
   <div class="mt-8 bg-white p-6 rounded-lg shadow-lg">
     <h2 class="text-xl font-bold mb-6 text-gray-700">Your Car Insurance Policies</h2>
     <table class="min-w-full divide-y divide-gray-200 table-auto">
@@ -117,7 +113,7 @@
           <td class="px-6 py-4 whitespace-nowrap">${insurance.policyNumber}</td>
           <td class="px-6 py-4 whitespace-nowrap">${insurance.vehiculeType}</td>
           <td class="px-6 py-4 whitespace-nowrap">${insurance.endDate}</td>
-          <td class="px-6 py-4 whitespace-nowrap">${insurance.contract.Total}</td>
+          <td class="px-6 py-4 whitespace-nowrap">${insurance.contract.total}DH</td>
           <td class="px-6 py-4 whitespace-nowrap">
             <a href="/car-insurance/edit/${insurance.policyNumber}" class="text-blue-600 hover:underline">Edit</a> |
             <a href="/car-insurance/delete/${insurance.policyNumber}" class="text-red-600 hover:underline">Delete</a>

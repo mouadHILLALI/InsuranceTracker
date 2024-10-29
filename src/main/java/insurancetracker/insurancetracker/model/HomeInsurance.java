@@ -1,9 +1,6 @@
 package insurancetracker.insurancetracker.model;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToOne;
+import jakarta.persistence.*;
 
 import java.time.LocalDate;
 
@@ -14,7 +11,7 @@ public class HomeInsurance extends Insurance {
     private boolean isHouse;
     private boolean hasSecuritySystem;
     private boolean isInRiskZone;
-    @OneToOne
+    @OneToOne(fetch = FetchType.EAGER)
     private Contract contract;
     @ManyToOne
     private User user;
