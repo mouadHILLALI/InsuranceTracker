@@ -20,7 +20,7 @@
 <nav class="bg-blue-600 p-4 text-white shadow-md">
     <div class="container mx-auto flex justify-between items-center">
         <div>
-            <a href="/client-dashboard" class="text-xl font-bold">InsuranceTracker</a>
+            <a href="/Auth/client" class="text-xl font-bold">InsuranceTracker</a>
         </div>
         <div>
             <a href="/profile" class="px-4 hover:underline">Profile</a>
@@ -64,19 +64,19 @@
         <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
             <!-- Active Policies -->
             <div class="bg-blue-100 p-6 rounded-lg text-center shadow card">
-                <h3 class="text-3xl font-bold text-blue-600">3</h3>
+                <h3 class="text-3xl font-bold text-blue-600">${activeInsurances}</h3>
                 <p class="text-gray-700">Active Policies</p>
             </div>
 
             <!-- Claims Processed -->
             <div class="bg-green-100 p-6 rounded-lg text-center shadow card">
-                <h3 class="text-3xl font-bold text-green-600">5</h3>
-                <p class="text-gray-700">Claims Processed</p>
+                <h3 class="text-3xl font-bold text-green-600">${totalContracts}</h3>
+                <p class="text-gray-700">total contracts</p>
             </div>
 
             <!-- Total Premiums Paid -->
             <div class="bg-yellow-100 p-6 rounded-lg text-center shadow card">
-                <h3 class="text-3xl font-bold text-yellow-600">12,500 MAD</h3>
+                <h3 class="text-3xl font-bold text-yellow-600">${totalPremium}</h3>
                 <p class="text-gray-700">Total Premiums Paid</p>
             </div>
         </div>

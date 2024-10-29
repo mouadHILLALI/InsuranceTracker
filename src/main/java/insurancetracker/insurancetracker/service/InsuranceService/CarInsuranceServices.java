@@ -9,6 +9,8 @@ import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+
 @Service
 public class CarInsuranceServices {
     @Autowired
@@ -56,5 +58,19 @@ public class CarInsuranceServices {
             return 0;
         }
     }
+    public boolean validate(CarInsuranceDto insuranceDto) {
+        if (insuranceDto.getPolicyHolderName().isEmpty()) {
+            return false;
+        }
+        LocalDate startDate = insuranceDto.getStartDate();
+        LocalDate endDate = insuranceDto.getEndDate();
+        if (startDate == null || endDate == null) {
+            return false;
+        }
 
+        if (endDate.isBefore(startDate)) {
+            return false;
+        }
+        return true;
+    }
 }

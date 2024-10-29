@@ -2,6 +2,8 @@ package insurancetracker.insurancetracker.model;
 
 import jakarta.persistence.*;
 
+import java.util.Optional;
+
 @Entity(name = "contracts")
 public class Contract {
     @Id
@@ -37,6 +39,7 @@ public class Contract {
         this.healthInsurance = healthInsurance;
         this.total = total;
     }
+
 
     public String getJustifications() {
         return Justifications;

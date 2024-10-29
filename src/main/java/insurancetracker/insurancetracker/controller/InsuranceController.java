@@ -32,7 +32,9 @@ public class InsuranceController {
     @Autowired
     private ContractServices contractServices;
     @GetMapping("/health")
-    public String healthInsurance(Model model) {
+    public String healthInsurance(Model model , HttpSession session) {
+        User user = (User) session.getAttribute("user");
+        model.addAttribute("user", user);
         model.addAttribute("healthInsurance", new HealthInsurance());
         return "insurance/health";
     }
@@ -44,7 +46,9 @@ public class InsuranceController {
         return "insurance/car";
     }
     @GetMapping("/home")
-    public String homeInsurance(Model model) {
+    public String homeInsurance(Model model , HttpSession session) {
+        User user = (User) session.getAttribute("user");
+        model.addAttribute("user", user);
         model.addAttribute("homeInsurance", new HomeInsurance());
         return "insurance/home";
     }
@@ -61,10 +65,17 @@ public class InsuranceController {
             boolean isPro = Boolean.parseBoolean(isProfessionalUse);
             boolean hasAcc = Boolean.parseBoolean(hasAccidents);
             CarInsuranceDto carInsuranceDto = new CarInsuranceDto(policyHolderName, startDate, endDate, driverAge, vehiculeType, isPro, hasAcc);
-            double total = carInsuranceServices.qouteCalc(carInsuranceDto);
-            session.setAttribute("carInsuranceDto", carInsuranceDto);
-            session.setAttribute("total", total);
-            return "insurance/carQuote";
+            boolean flag = carInsuranceServices.validate(carInsuranceDto);
+            if (flag) {
+                double total = carInsuranceServices.qouteCalc(carInsuranceDto);
+                session.setAttribute("carInsuranceDto", carInsuranceDto);
+                session.setAttribute("total", total);
+                return "insurance/carQuote";
+            }else{
+                model.addAttribute("error", "An error occurred while creating the insurance. Please try again.");
+                return "insurance/car";
+            }
+
         } catch (Exception ex) {
             System.err.println("Error creating insurance: " + ex.getMessage());
             model.addAttribute("error", "An error occurred while creating the insurance. Please try again.");
@@ -177,24 +188,66 @@ public class InsuranceController {
         try {
             switch (type){
                 case "car":
-                    CarInsuranceDto carInsuranceDto = (CarInsuranceDto) session.getAttribute("carInsuranceDto");
-                    AutoInsurance caInsurance = carInsuranceServices.create(carInsuranceDto , session);
-                    ContractDto contractDto = new ContractDto("file" ,caInsurance );
-                    boolean flag = contractServices.addCarContract(contractDto ,caInsurance, total);
-                    System.out.println(flag);
-                    if (caInsurance!=null&&flag){
-                        return "redirect:/Auth/client";
-                    }else{
-                        return "redirect:/insurance/contract";
-                    }
+                   carContract(session , total);
                 case "home":
+                    homeContract(session , total);
                     break;
                 case "health":
+                    healthContract(session , total);
                     break;
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
         return "insurance/carQuote";
+    }
+    public String carContract(HttpSession session , double total){
+        try {
+            CarInsuranceDto carInsuranceDto = (CarInsuranceDto) session.getAttribute("carInsuranceDto");
+            AutoInsurance caInsurance = carInsuranceServices.create(carInsuranceDto , session);
+            ContractDto contractDto = new ContractDto("file" ,caInsurance , total );
+            boolean flag = contractServices.addCarContract(contractDto ,caInsurance);
+            if (caInsurance!=null&&flag){
+                return "redirect:/Auth/client";
+            }else{
+                return "redirect:/Auth/client";
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "redirect:/insurance/contract";
+        }
+
+    }
+    public String homeContract(HttpSession session, double total){
+        try {
+            HomeInsuranceDto insuranceDto = (HomeInsuranceDto) session.getAttribute("homeInsurance");
+            HomeInsurance Insurance = homeInsuranceServices.create(insuranceDto);
+            ContractDto contractDto = new ContractDto("file" ,Insurance , total );
+            boolean flag = contractServices.addHomeContract(contractDto , Insurance);
+            if (Insurance!=null&&flag){
+                return "redirect:/Auth/client";
+            }else{
+                return "redirect:/Auth/client";
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "redirect:/insurance/contract";
+        }
+    }
+    public String healthContract(HttpSession session , double total){
+        try {
+            HealthInsuranceDto insuranceDto = (HealthInsuranceDto) session.getAttribute("healthInsurance");
+            HealthInsurance Insurance = healthInsuranceServices.createHealthInsurance(insuranceDto);
+            ContractDto contractDto = new ContractDto("file" ,Insurance , total );
+            boolean flag = contractServices.addHealthContract(contractDto , Insurance);
+            if (Insurance!=null&&flag){
+                return "redirect:/Auth/client";
+            }else{
+                return "redirect:/Auth/client";
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "redirect:/Auth/client";
+        }
     }
 }

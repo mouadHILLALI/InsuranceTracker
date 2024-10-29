@@ -37,4 +37,48 @@ public class UserServices {
         }
         return null;
     }
+
+   public long getTotalContracts(User user) {
+        try {
+           return user.getHomeInsurances().stream()
+                    .filter(homeInsurance -> homeInsurance.getContract() != null)
+                    .count()
+                    + user.getCarInsurance().stream()
+                    .filter(insurance -> insurance.getContract() != null)
+                    .count()
+                    + user.getHealthInsurance().stream()
+                    .filter(insurance -> insurance.getContract() != null)
+                    .count();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return 0;
+        }
+   }
+   public double totalPremium(User user) {
+        try {
+            return user.getHomeInsurances().stream()
+                    .filter(homeInsurance -> homeInsurance.getContract() != null)
+                    .mapToDouble(homeInsurance -> homeInsurance.getContract().getTotal())
+                    .sum()
+                    + user.getCarInsurance().stream()
+                    .filter(insurance -> insurance.getContract() != null)
+                    .mapToDouble(insurance -> insurance.getContract().getTotal())
+                    .sum()
+                    + user.getHealthInsurance().stream()
+                    .filter(insurance -> insurance.getContract() != null)
+                    .mapToDouble(insurance -> insurance.getContract().getTotal())
+                    .sum();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return 0;
+        }
+   }
+   public int activeInsurance(User user) {
+        try {
+            return  user.getCarInsurance().size() + user.getHomeInsurances().size() + user.getHealthInsurance().size();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return 0;
+        }
+   }
 }

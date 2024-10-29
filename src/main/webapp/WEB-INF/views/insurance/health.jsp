@@ -1,3 +1,4 @@
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <html lang="en">
 <head>
@@ -100,19 +101,18 @@
       </tr>
       </thead>
       <tbody class="bg-white divide-y divide-gray-200">
-      <!-- Example Row -->
-      <tr>
-        <td class="px-6 py-4 whitespace-nowrap">HLT12345</td>
-        <td class="px-6 py-4 whitespace-nowrap">MediCare</td>
-        <td class="px-6 py-4 whitespace-nowrap">200,000 MAD</td>
-        <td class="px-6 py-4 whitespace-nowrap">2025-06-30</td>
-        <td class="px-6 py-4 whitespace-nowrap">
-          <a href="/health-insurance/edit/HLT12345" class="text-blue-600 hover:underline">Edit</a> |
-          <a href="/health-insurance/delete/HLT12345" class="text-red-600 hover:underline">Delete</a>
-        </td>
-      </tr>
-      <!-- End Example Row -->
-      <!-- More policies will be rendered here dynamically -->
+      <c:forEach var="insurance" items="${user.healthInsurance}">
+        <tr>
+          <td class="px-6 py-4 whitespace-nowrap">${insurance.policyHolderName}</td>
+          <td class="px-6 py-4 whitespace-nowrap">${insurance.coverageType}</td>
+          <td class="px-6 py-4 whitespace-nowrap">${insurance.endDate}</td>
+          <td class="px-6 py-4 whitespace-nowrap">${insurance.contract.Total}</td>
+          <td class="px-6 py-4 whitespace-nowrap">
+            <a href="/car-insurance/edit/${insurance.policyNumber}" class="text-blue-600 hover:underline">Edit</a> |
+            <a href="/car-insurance/delete/${insurance.policyNumber}" class="text-red-600 hover:underline">Delete</a>
+          </td>
+        </tr>
+      </c:forEach>
       </tbody>
     </table>
   </div>

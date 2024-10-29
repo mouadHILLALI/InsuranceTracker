@@ -19,13 +19,13 @@ public class User {
     private String password;
     @Column(nullable = false)
     private String address;
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private List<AutoInsurance> carInsurance;
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private List<HealthInsurance> healthInsurance;
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private List<HomeInsurance> homeInsurances;
 
 
@@ -65,5 +65,20 @@ public class User {
     }
     public void setAddress(String address) {
         this.address = address;
+    }
+    public List<AutoInsurance> getCarInsurance() {
+        return carInsurance;
+    }
+    public void setCarInsurance(List<AutoInsurance> carInsurance) {
+        this.carInsurance = carInsurance;
+    }
+    public List<HealthInsurance> getHealthInsurance() {
+        return healthInsurance;
+    }
+    public void setHealthInsurance(List<HealthInsurance> healthInsurance) {
+        this.healthInsurance = healthInsurance;
+    }
+    public List<HomeInsurance> getHomeInsurances() {
+        return homeInsurances;
     }
 }

@@ -82,6 +82,12 @@ public class AuthController {
     @GetMapping("/client")
     public String getClient(HttpSession session, Model model) {
         User user = (User) session.getAttribute("user");
+        int activeInsurances = userServices.activeInsurance(user);
+        session.setAttribute("activeInsurances", activeInsurances);
+        long totalContracts = userServices.getTotalContracts(user);
+        session.setAttribute("totalContracts", totalContracts);
+        double totalPremium = userServices.totalPremium(user);
+        session.setAttribute("totalPremium", totalPremium);
         if (user != null) {
             model.addAttribute("user", user);
             return "Client/client";
