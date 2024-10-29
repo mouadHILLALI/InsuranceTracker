@@ -5,11 +5,11 @@ import insurancetracker.insurancetracker.dtos.ContractDto;
 import insurancetracker.insurancetracker.dtos.HealthInsuranceDto;
 import insurancetracker.insurancetracker.dtos.HomeInsuranceDto;
 import insurancetracker.insurancetracker.model.*;
-import insurancetracker.insurancetracker.repository.ContractRepository;
 import insurancetracker.insurancetracker.service.ContractService.ContractServices;
 import insurancetracker.insurancetracker.service.InsuranceService.CarInsuranceServices;
 import insurancetracker.insurancetracker.service.InsuranceService.HealthInsuranceServices;
 import insurancetracker.insurancetracker.service.InsuranceService.HomeInsuranceServices;
+import jakarta.servlet.annotation.MultipartConfig;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -18,11 +18,16 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.LocalDate;
 
 @Controller
+@MultipartConfig
 @RequestMapping("/insurance")
 public class InsuranceController {
+    private static final String UPLOAD_DIR = "uploads/";
     @Autowired
     private CarInsuranceServices carInsuranceServices;
     @Autowired
@@ -183,17 +188,21 @@ public class InsuranceController {
         }
     }
 
+
     @PostMapping("/contract")
-    public String contract(Model model , @RequestParam(name = "total") double total ,@RequestParam(name = "insuranceType") String type, HttpSession session) {
+    public String contract(Model model , @RequestParam(name = "total") double total ,@RequestParam(name = "insuranceType") String type , @RequestParam(name = "justificationFile") MultipartFile file  , HttpSession session) {
         try {
+            byte[] bytes = file.getBytes();
+            Path path = Paths.get(UPLOAD_DIR + file.getOriginalFilename());
+            Files.write(path, bytes);
             switch (type){
                 case "car":
-                   carContract(session , total);
+                   carContract(session , total , path);
                 case "home":
-                    homeContract(session , total);
+                    homeContract(session , total , path);
                     break;
                 case "health":
-                    healthContract(session , total);
+                    healthContract(session , total , path);
                     break;
             }
         } catch (Exception e) {
@@ -201,11 +210,11 @@ public class InsuranceController {
         }
         return "insurance/carQuote";
     }
-    public String carContract(HttpSession session , double total){
+    public String carContract(HttpSession session , double total , Path path){
         try {
             CarInsuranceDto carInsuranceDto = (CarInsuranceDto) session.getAttribute("carInsuranceDto");
             AutoInsurance caInsurance = carInsuranceServices.create(carInsuranceDto , session);
-            ContractDto contractDto = new ContractDto("file" ,caInsurance , total );
+            ContractDto contractDto = new ContractDto(path ,caInsurance , total );
             boolean flag = contractServices.addCarContract(contractDto ,caInsurance);
             if (caInsurance!=null&&flag){
                 return "redirect:/Auth/client";
@@ -218,11 +227,11 @@ public class InsuranceController {
         }
 
     }
-    public String homeContract(HttpSession session, double total){
+    public String homeContract(HttpSession session, double total, Path path){
         try {
             HomeInsuranceDto insuranceDto = (HomeInsuranceDto) session.getAttribute("homeInsurance");
             HomeInsurance Insurance = homeInsuranceServices.create(insuranceDto);
-            ContractDto contractDto = new ContractDto("file" ,Insurance , total );
+            ContractDto contractDto = new ContractDto(path ,Insurance , total );
             boolean flag = contractServices.addHomeContract(contractDto , Insurance);
             if (Insurance!=null&&flag){
                 return "redirect:/Auth/client";
@@ -234,11 +243,11 @@ public class InsuranceController {
             return "redirect:/insurance/contract";
         }
     }
-    public String healthContract(HttpSession session , double total){
+    public String healthContract(HttpSession session , double total, Path path){
         try {
             HealthInsuranceDto insuranceDto = (HealthInsuranceDto) session.getAttribute("healthInsurance");
             HealthInsurance Insurance = healthInsuranceServices.createHealthInsurance(insuranceDto);
-            ContractDto contractDto = new ContractDto("file" ,Insurance , total );
+            ContractDto contractDto = new ContractDto(path ,Insurance , total );
             boolean flag = contractServices.addHealthContract(contractDto , Insurance);
             if (Insurance!=null&&flag){
                 return "redirect:/Auth/client";

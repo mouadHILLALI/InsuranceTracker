@@ -9,7 +9,7 @@
 <div class="bg-white rounded-lg shadow-lg p-8 w-full max-w-lg">
   <h2 class="text-2xl font-semibold text-gray-800 mb-6 text-center">Upload Justification File</h2>
 
-  <form action="/insurance/contract" method="post" >
+  <form action="/insurance/contract" enctype="multipart/form-data" method="post" >
     <div class="mb-4">
       <input type="hidden" name="insuranceType" value="${type}">
     </div>

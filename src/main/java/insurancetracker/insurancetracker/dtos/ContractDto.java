@@ -1,7 +1,9 @@
 package insurancetracker.insurancetracker.dtos;
 
-public record ContractDto(String justification , Object obj , double total) {
-    public String getJustification() {
+import java.nio.file.Path;
+
+public record ContractDto(Path justification , Object obj , double total) {
+    public Path getJustification() {
         return justification;
     }
     public Object getObj() {

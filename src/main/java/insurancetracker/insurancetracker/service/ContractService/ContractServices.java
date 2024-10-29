@@ -20,7 +20,7 @@
         public boolean addCarContract(ContractDto contractDto , AutoInsurance carInsurance) {
             try {
                 AutoInsurance insurance = (AutoInsurance) insuranceRepository.findById(carInsurance.getPolicyNumber()).orElse(null);
-                Contract contract = new Contract(contractDto.getJustification() , insurance , contractDto.getTotal());
+                Contract contract = new Contract(String.valueOf(contractDto.getJustification()), insurance , contractDto.getTotal());
                 contract = contractRepository.save(contract);
                 if (contract != null) {
                     return true;
@@ -36,7 +36,7 @@
         public boolean addHealthContract(ContractDto contractDto , HealthInsurance healthInsurance) {
         try {
             HealthInsurance insurance = (HealthInsurance) insuranceRepository.findById(healthInsurance.getPolicyNumber()).orElse(null);
-            Contract contract = new Contract(contractDto.getJustification() , insurance , contractDto.getTotal());
+            Contract contract = new Contract(String.valueOf(contractDto.getJustification()), insurance , contractDto.getTotal());
             contract = contractRepository.save(contract);
             if (contract != null) {
                 return true;
@@ -52,7 +52,7 @@
         public boolean addHomeContract(ContractDto contractDto , HomeInsurance homeInsurance) {
         try {
             HomeInsurance insurance = (HomeInsurance) insuranceRepository.findById(homeInsurance.getPolicyNumber()).orElse(null);
-            Contract contract = new Contract(contractDto.getJustification() , insurance , contractDto.getTotal());
+            Contract contract = new Contract(String.valueOf(contractDto.getJustification()), insurance , contractDto.getTotal());
             contract = contractRepository.save(contract);
             if (contract != null) {
                 return true;
