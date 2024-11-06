@@ -9,7 +9,7 @@ import java.time.LocalDate;
 public abstract class Insurance {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
-    private int policyNumber;
+    private int id;
     @Column(nullable = false)
     protected String PolicyHolderName;
     protected LocalDate startDate;
@@ -17,10 +17,10 @@ public abstract class Insurance {
 
     protected Insurance(){}
 
-    protected int getPolicyNumber() {
-        return policyNumber;
+    protected int getId() {
+        return id;
     }
-    protected void setPolicyNumber(int policyNumber) {
+    protected void setId(int policyNumber) {
         policyNumber = policyNumber;
     }
     protected String getPolicyHolderName() {

@@ -24,7 +24,7 @@ public class CarInsuranceServicesTest {
     public void calcQoute() {
         CarInsuranceDto carInsuranceDto = new CarInsuranceDto("mouad", LocalDate.EPOCH, LocalDate.now(), 45, "lux", true, true);
         double quote = carInsuranceServices.qouteCalc(carInsuranceDto);
-        assertNotNull(quote);
+        assertNotNull(quote);   
     }
     @Test
     public void validate(){

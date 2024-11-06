@@ -14,7 +14,7 @@ public class AutoInsurance extends Insurance {
     private boolean hasAccidents;
     @ManyToOne
     private User user;
-    @OneToOne(fetch = FetchType.EAGER)
+    @OneToOne(fetch = FetchType.EAGER , cascade = CascadeType.ALL)
     private Contract contract;
     public AutoInsurance() {}
     public AutoInsurance(String policyHolderName, LocalDate startDate, LocalDate endDate,
@@ -64,12 +64,12 @@ public class AutoInsurance extends Insurance {
         super.setPolicyHolderName(PolicyHolderName);
     }
     @Override
-    public int getPolicyNumber(){
-        return super.getPolicyNumber();
+    public int getId(){
+        return super.getId();
     }
     @Override
-    public void setPolicyNumber(int policyNumber){
-        super.setPolicyNumber(policyNumber);
+    public void setId(int id){
+        super.setId(id);
     }
     @Override
     public LocalDate getStartDate() {

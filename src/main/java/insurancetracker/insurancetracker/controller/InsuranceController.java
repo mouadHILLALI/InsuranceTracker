@@ -9,25 +9,17 @@ import insurancetracker.insurancetracker.service.ContractService.ContractService
 import insurancetracker.insurancetracker.service.InsuranceService.CarInsuranceServices;
 import insurancetracker.insurancetracker.service.InsuranceService.HealthInsuranceServices;
 import insurancetracker.insurancetracker.service.InsuranceService.HomeInsuranceServices;
-import jakarta.servlet.annotation.MultipartConfig;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
-
-import java.io.File;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.time.LocalDate;
 
 @Controller
-@MultipartConfig
 @RequestMapping("/insurance")
 public class InsuranceController {
-    private static final String UPLOAD_DIR = "uploads/";
+    private static final String UPLOAD_DIR = "tmp/";
     @Autowired
     private CarInsuranceServices carInsuranceServices;
     @Autowired
@@ -46,7 +38,7 @@ public class InsuranceController {
     @GetMapping("/car")
     public String carInsurance(HttpSession session, Model model) {
         User user = (User) session.getAttribute("user");
-        model.addAttribute("user", user);
+        session.setAttribute("user", user);
         model.addAttribute("carInsurance", new AutoInsurance());
         return "insurance/car";
     }
@@ -74,7 +66,11 @@ public class InsuranceController {
             if (flag) {
                 double total = carInsuranceServices.qouteCalc(carInsuranceDto);
                 session.setAttribute("carInsuranceDto", carInsuranceDto);
+                if (total == 0){
+                    session.setAttribute("total", 0);
+                }else{
                 session.setAttribute("total", total);
+                }
                 return "insurance/carQuote";
             }else{
                 model.addAttribute("error", "An error occurred while creating the insurance. Please try again.");
@@ -153,10 +149,16 @@ public class InsuranceController {
             boolean isInRisk = isInRiskZone.equals("yes") ? true : false;
             HomeInsuranceDto homeInusrance = new HomeInsuranceDto(PolicyHolderName , startDate , endDate ,PropertyValue,
                     isHous , hasSecurity , isInRisk ,user);
+            boolean flag = homeInsuranceServices.validate(homeInusrance);
+            if (flag) {
             session.setAttribute("homeInsurance" , homeInusrance);
             double homeTotal = homeInsuranceServices.calc(homeInusrance);
             session.setAttribute("total", homeTotal);
-           return "insurance/homeQoute";
+            return "insurance/homeQoute";
+            }else {
+                session.setAttribute("alertMessage" , "invalid inputs");
+                return "insurance/home";
+            }
         } catch (Exception e) {
             e.printStackTrace();
             return "redirect:/insurance/home";
@@ -178,10 +180,16 @@ public class InsuranceController {
             boolean hasChronicConditio = hasChronicCondition.equals("yes") ? true : false;
             HealthInsuranceDto healthInsuranceDto = new HealthInsuranceDto(PolicyHolderName , startDate , endDate ,age,
                     CoverageType , hasChronicConditio , user);
+            boolean flag = healthInsuranceServices.validate(healthInsuranceDto);
+            if (flag){
             session.setAttribute("healthInsurance" , healthInsuranceDto);
             double healthTotal = healthInsuranceServices.calc(healthInsuranceDto);
             session.setAttribute("total", healthTotal);
             return "insurance/healthQoute";
+            }else{
+                session.setAttribute("alertMessage" , "invalid inputs");
+                return "redirect:/insurance/health";
+            }
         } catch (Exception e) {
             e.printStackTrace();
             return "redirect:/insurance/health";
@@ -190,73 +198,144 @@ public class InsuranceController {
 
 
     @PostMapping("/contract")
-    public String contract(Model model , @RequestParam(name = "total") double total ,@RequestParam(name = "insuranceType") String type , @RequestParam(name = "justificationFile") MultipartFile file  , HttpSession session) {
+    public String contract(@RequestParam(name = "total") double total ,@RequestParam(name = "insuranceType") String type , HttpSession session) {
         try {
-            byte[] bytes = file.getBytes();
-            Path path = Paths.get(UPLOAD_DIR + file.getOriginalFilename());
-            Files.write(path, bytes);
             switch (type){
                 case "car":
-                   carContract(session , total , path);
+                   carContract(session , total , "file");
+                   break;
                 case "home":
-                    homeContract(session , total , path);
+                    homeContract(session , total , "file");
                     break;
                 case "health":
-                    healthContract(session , total , path);
+                    healthContract(session , total , "file");
                     break;
             }
+            return "redirect:/Auth/client";
         } catch (Exception e) {
             e.printStackTrace();
+            return "Contract/contract";
         }
-        return "insurance/carQuote";
+
     }
-    public String carContract(HttpSession session , double total , Path path){
+
+    @GetMapping("/delete/{id}/{type}")
+    public String deleteInsurance(@PathVariable(name = "id") int id , @PathVariable("type") String type, HttpSession session) {
+        try {
+            switch (type){
+                case "car":
+                    deleteCarInsurance(session , id , "car");
+                    break;
+                case "home":
+                    deleteHomeInsurance(session, id , "home");
+                    break;
+                case "health":
+                    deleteHealthInsurance(session , id, "health");
+                    break;
+                default:
+                    session.setAttribute("alertMessage" , "no insurance was deleted");
+                    return "redirect:/Auth/client";
+            }
+            return "redirect:/Auth/client";
+        } catch (Exception e) {
+            session.setAttribute("alertMessage" , "no insurance was deleted");
+            e.printStackTrace();
+            return "redirect:/Auth/client";
+        }
+    }
+    public String carContract(HttpSession session , double total , String path){
         try {
             CarInsuranceDto carInsuranceDto = (CarInsuranceDto) session.getAttribute("carInsuranceDto");
             AutoInsurance caInsurance = carInsuranceServices.create(carInsuranceDto , session);
             ContractDto contractDto = new ContractDto(path ,caInsurance , total );
             boolean flag = contractServices.addCarContract(contractDto ,caInsurance);
             if (caInsurance!=null&&flag){
+                session.setAttribute("alertMessage" , "Car insurance was created successfully");
                 return "redirect:/Auth/client";
             }else{
+                session.setAttribute("alertMessage" , "failed to create car insurance");
                 return "redirect:/Auth/client";
             }
         } catch (Exception e) {
             e.printStackTrace();
-            return "redirect:/insurance/contract";
+            session.setAttribute("alertMessage" , "An error occurred while creating the car insurance");
+            return "redirect:/Auth/client";
         }
 
     }
-    public String homeContract(HttpSession session, double total, Path path){
+    public String homeContract(HttpSession session, double total, String path){
         try {
             HomeInsuranceDto insuranceDto = (HomeInsuranceDto) session.getAttribute("homeInsurance");
             HomeInsurance Insurance = homeInsuranceServices.create(insuranceDto);
             ContractDto contractDto = new ContractDto(path ,Insurance , total );
             boolean flag = contractServices.addHomeContract(contractDto , Insurance);
             if (Insurance!=null&&flag){
+                session.setAttribute("alertMessage" , "Home insurance was created successfully");
                 return "redirect:/Auth/client";
             }else{
+                session.setAttribute("alertMessage" , "couldn't create home insurance");
                 return "redirect:/Auth/client";
             }
         } catch (Exception e) {
             e.printStackTrace();
-            return "redirect:/insurance/contract";
+            session.setAttribute("alertMessage" , "An error occurred while creating the home insurance");
+            return "redirect:/Auth/client";
         }
     }
-    public String healthContract(HttpSession session , double total, Path path){
+    public String healthContract(HttpSession session , double total, String path){
         try {
             HealthInsuranceDto insuranceDto = (HealthInsuranceDto) session.getAttribute("healthInsurance");
             HealthInsurance Insurance = healthInsuranceServices.createHealthInsurance(insuranceDto);
             ContractDto contractDto = new ContractDto(path ,Insurance , total );
             boolean flag = contractServices.addHealthContract(contractDto , Insurance);
             if (Insurance!=null&&flag){
+                session.setAttribute("alertMessage" , "Health insurance was created successfully");
                 return "redirect:/Auth/client";
             }else{
+                session.setAttribute("alertMessage" , "couldn't create health insurance");
                 return "redirect:/Auth/client";
             }
         } catch (Exception e) {
             e.printStackTrace();
+            session.setAttribute("alertMessage" , "An error occurred while creating the health insurance");
             return "redirect:/Auth/client";
+        }
+    }
+
+    public void deleteCarInsurance(HttpSession session , int id , String type){
+        try {
+            if (contractServices.delete(id , type)){
+                session.setAttribute("alertMessage" , "Car insurance was deleted successfully");
+            }else{
+                session.setAttribute("alertMessage" , "couldn't delete car insurance");
+            }
+        } catch (Exception e) {
+            session.setAttribute("alertMessage" , "couldn't delete car insurance");
+            e.printStackTrace();
+        }
+    }
+    public void deleteHomeInsurance(HttpSession session , int id, String type){
+        try {
+            if (contractServices.delete(id , type)){
+                session.setAttribute("alertMessage" , "HomeInsurance was deleted successfully");
+            }else{
+                session.setAttribute("alertMessage" , "couldn't delete homeInsurance");
+            }
+        } catch (Exception e) {
+            session.setAttribute("alertMessage" , "couldn't delete homeInsurance");
+            e.printStackTrace();
+        }
+    }
+    public void deleteHealthInsurance(HttpSession session , int id , String type){
+        try {
+            if (contractServices.delete(id , type)){
+                session.setAttribute("alertMessage" , "HealthInsurance was deleted successfully");
+            }else{
+                session.setAttribute("alertMessage" , "couldn't delete healthInsurance");
+            }
+        } catch (Exception e) {
+            session.setAttribute("alertMessage" , "couldn't delete healthInsurance");
+            e.printStackTrace();
         }
     }
 }

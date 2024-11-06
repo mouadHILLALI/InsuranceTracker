@@ -67,10 +67,16 @@ public class CarInsuranceServices {
         if (startDate == null || endDate == null) {
             return false;
         }
-
-        if (endDate.isBefore(startDate)) {
+        if (endDate.isBefore(startDate)|startDate.isBefore(LocalDate.now())) {
             return false;
         }
         return true;
+    }
+    public boolean delete(int id) {
+        if (insuranceRepository.existsById(id)) {
+            insuranceRepository.deleteById(id);
+            return true;
+        }
+        return false;
     }
 }

@@ -12,16 +12,16 @@ public class Contract {
     @Column(nullable = false)
     private String Justifications;
     private double total;
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "autoInsurance_id", referencedColumnName = "policynumber")
+    @OneToOne(cascade = CascadeType.REMOVE)
+    @JoinColumn(name = "autoInsurance_id", referencedColumnName = "id")
     private AutoInsurance autoInsurance;
 
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "homeInsurance_id", referencedColumnName = "policynumber")
+    @OneToOne(cascade = CascadeType.REMOVE)
+    @JoinColumn(name = "homeInsurance_id", referencedColumnName = "id")
     private HomeInsurance homeInsurance;
 
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "healthInsurance_id", referencedColumnName = "policynumber")
+    @OneToOne(cascade = CascadeType.REMOVE)
+    @JoinColumn(name = "healthInsurance_id", referencedColumnName = "id")
     private HealthInsurance healthInsurance;
     public Contract() {}
     public Contract(String Justifications, AutoInsurance autoInsurance , double total) {

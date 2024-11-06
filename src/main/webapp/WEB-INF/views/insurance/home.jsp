@@ -29,9 +29,16 @@
         </div>
     </div>
 </nav>
-
-<!-- Home Insurance Management Section -->
-<div class="container mx-auto mt-8">
+<c:if test="${not empty sessionScope.alertMessage}">
+    <div class="container mx-auto mt-4">
+        <div class="bg-blue-100 border border-blue-400 text-blue-700 px-4 py-3 rounded relative" role="alert">
+            <span class="block sm:inline">${sessionScope.alertMessage}</span>
+            <button onclick="this.parentElement.style.display='none';" class="absolute top-0 bottom-0 right-0 px-4 py-3">
+                <svg class="fill-current h-6 w-6 text-blue-500" role="button" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M14.348 5.652a1 1 0 010 1.415L11.414 10l2.934 2.933a1 1 0 01-1.415 1.415L10 11.414l-2.933 2.934a1 1 0 01-1.415-1.415L8.586 10 5.652 7.067a1 1 0 011.415-1.415L10 8.586l2.933-2.934a1 1 0 011.415 0z"/></svg>
+            </button>
+        </div>
+    </div>
+</c:if><div class="container mx-auto mt-8">
     <div class="bg-white p-6 rounded-lg shadow-lg">
         <h2 class="text-2xl font-bold mb-6 text-gray-700">Manage Your Home Insurance</h2>
 
@@ -111,13 +118,13 @@
             <tbody class="bg-white divide-y divide-gray-200">
             <c:forEach var="insurance" items="${user.homeInsurances}">
                 <tr>
-                    <td class="px-6 py-4 whitespace-nowrap">${insurance.policyNumber}</td>
+                    <td class="px-6 py-4 whitespace-nowrap">${insurance.id}</td>
                     <td class="px-6 py-4 whitespace-nowrap">${insurance.contract.total}DH</td>
                     <td class="px-6 py-4 whitespace-nowrap">${insurance.propertyValue}DH</td>
                     <td class="px-6 py-4 whitespace-nowrap">${insurance.endDate}</td>
                     <td class="px-6 py-4 whitespace-nowrap">
-                        <a href="/car-insurance/edit/${insurance.policyNumber}" class="text-blue-600 hover:underline">Edit</a> |
-                        <a href="/car-insurance/delete/${insurance.policyNumber}" class="text-red-600 hover:underline">Delete</a>
+                        <a href="/car-insurance/edit/${insurance.id}" class="text-blue-600 hover:underline">Edit</a> |
+                        <a href="/insurance/delete/${insurance.id}/home" class="text-red-600 hover:underline">Delete</a>
                     </td>
                 </tr>
             </c:forEach>

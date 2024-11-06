@@ -30,8 +30,16 @@
   </div>
 </nav>
 
-<!-- Health Insurance Management Section -->
-<div class="container mx-auto mt-8">
+<c:if test="${not empty sessionScope.alertMessage}">
+  <div class="container mx-auto mt-4">
+    <div class="bg-blue-100 border border-blue-400 text-blue-700 px-4 py-3 rounded relative" role="alert">
+      <span class="block sm:inline">${sessionScope.alertMessage}</span>
+      <button onclick="this.parentElement.style.display='none';" class="absolute top-0 bottom-0 right-0 px-4 py-3">
+        <svg class="fill-current h-6 w-6 text-blue-500" role="button" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M14.348 5.652a1 1 0 010 1.415L11.414 10l2.934 2.933a1 1 0 01-1.415 1.415L10 11.414l-2.933 2.934a1 1 0 01-1.415-1.415L8.586 10 5.652 7.067a1 1 0 011.415-1.415L10 8.586l2.933-2.934a1 1 0 011.415 0z"/></svg>
+      </button>
+    </div>
+  </div>
+</c:if><div class="container mx-auto mt-8">
   <div class="bg-white p-6 rounded-lg shadow-lg">
     <h2 class="text-2xl font-bold mb-6 text-gray-700">Manage Your Health Insurance</h2>
 
@@ -70,14 +78,18 @@
         <input type="radio" id="chronicNo" name="hasChronicCondition" value="no">
         <label for="chronicNo">No</label>
       </div>
-      <!-- Policy Expiry Date -->
       <div>
-        <label for="coverageType" class="block text-sm font-medium text-gray-700">Coverage type :</label>
-        <input type="text" id="coverageType" name="CoverageType" required
-               class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+        <label for="coverageType" class="block text-sm font-medium text-gray-700">Coverage Type:</label>
+        <select id="coverageType" name="CoverageType" required
+                class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+          <option value="" disabled selected>Select coverage type</option>
+          <option value="Premium">Premium</option>
+          <option value="Basic">Basic</option>
+          <option value="Standard">Standard</option>
+          <option value="Comprehensive">Comprehensive</option>
+        </select>
       </div>
 
-      <!-- Submit Button -->
       <div class="col-span-2 text-right">
         <button type="submit"
                 class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg shadow-md transition duration-300">
@@ -103,13 +115,13 @@
       <tbody class="bg-white divide-y divide-gray-200">
       <c:forEach var="insurance" items="${user.healthInsurance}">
         <tr>
-          <td class="px-6 py-4 whitespace-nowrap">${insurance.policyNumber}</td>
+          <td class="px-6 py-4 whitespace-nowrap">${insurance.id}</td>
           <td class="px-6 py-4 whitespace-nowrap">${insurance.policyHolderName}</td>
           <td class="px-6 py-4 whitespace-nowrap">${insurance.contract.total}DH</td>
           <td class="px-6 py-4 whitespace-nowrap">${insurance.endDate}</td>
           <td class="px-6 py-4 whitespace-nowrap">
-            <a href="/car-insurance/edit/${insurance.policyNumber}" class="text-blue-600 hover:underline">Edit</a> |
-            <a href="/car-insurance/delete/${insurance.policyNumber}" class="text-red-600 hover:underline">Delete</a>
+            <a href="/car-insurance/edit/${insurance.id}" class="text-blue-600 hover:underline">Edit</a> |
+            <a href="/insurance/delete/${insurance.id}/health" class="text-red-600 hover:underline">Delete</a>
           </td>
         </tr>
       </c:forEach>

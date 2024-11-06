@@ -7,6 +7,8 @@ import insurancetracker.insurancetracker.repository.InsuranceRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+
 @Service
 public class HealthInsuranceServices {
     @Autowired
@@ -48,5 +50,27 @@ public class HealthInsuranceServices {
             e.printStackTrace();
             return 0;
         }
+    }
+    public boolean validate(HealthInsuranceDto insuranceDto) {
+        if (insuranceDto.getPolicyHolderName().isEmpty()) {
+            return false;
+        }
+        LocalDate startDate = insuranceDto.getStartDate();
+        LocalDate endDate = insuranceDto.getEndDate();
+        if (startDate == null || endDate == null) {
+            return false;
+        }
+
+        if (endDate.isBefore(startDate)|startDate.isBefore(LocalDate.now())) {
+            return false;
+        }
+        return true;
+    }
+    public boolean delete(int id) {
+        if (healthInsuranceRepository.existsById(id)) {
+            healthInsuranceRepository.deleteById(id);
+            return true;
+        }
+        return false;
     }
 }

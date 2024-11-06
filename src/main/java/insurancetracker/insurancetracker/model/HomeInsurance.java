@@ -11,7 +11,7 @@ public class HomeInsurance extends Insurance {
     private boolean isHouse;
     private boolean hasSecuritySystem;
     private boolean isInRiskZone;
-    @OneToOne(fetch = FetchType.EAGER)
+    @OneToOne(fetch = FetchType.EAGER , cascade = CascadeType.ALL)
     private Contract contract;
     @ManyToOne
     private User user;
@@ -71,12 +71,12 @@ public class HomeInsurance extends Insurance {
         super.setPolicyHolderName(PolicyHolderName);
     }
     @Override
-    public int getPolicyNumber(){
-        return super.getPolicyNumber();
+    public int getId(){
+        return super.getId();
     }
     @Override
-    public void setPolicyNumber(int policyNumber){
-        super.setPolicyNumber(policyNumber);
+    public void setId(int id){
+        super.setId(id);
     }
     @Override
     public LocalDate getStartDate() {
