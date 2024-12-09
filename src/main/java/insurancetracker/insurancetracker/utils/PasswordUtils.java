@@ -1,10 +1,14 @@
 package insurancetracker.insurancetracker.utils;
 
+import org.springframework.context.annotation.Bean;
+import org.springframework.stereotype.Component;
+
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 
+@Component
 public class PasswordUtils {
     public static String hashPassword(String password) {
         try {

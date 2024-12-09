@@ -2,11 +2,13 @@ package insurancetracker.insurancetracker.service.InsuranceService;
 
 import insurancetracker.insurancetracker.dtos.HomeInsuranceDto;
 import insurancetracker.insurancetracker.model.User;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.time.LocalDate;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class HomeInsuranceServicesTest {
 
@@ -19,6 +21,6 @@ public class HomeInsuranceServicesTest {
         User user = new User();
         HomeInsuranceDto homeInsuranceDto = new HomeInsuranceDto("test" , LocalDate.EPOCH , LocalDate.now() ,propertyValue , true , true , false , user );
         double actualPremium = homeInsuranceServices.calc(homeInsuranceDto);
-        assertEquals("The calculated premium should match the expected premium.", expectedPremium, actualPremium, 0.01);
+        assertEquals(expectedPremium, actualPremium, 0.01);
     }
 }

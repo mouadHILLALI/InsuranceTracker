@@ -95,4 +95,21 @@ public class AuthController {
             return "redirect:/Auth/login";
         }
     }
+
+    @GetMapping("/profile")
+    public String getProfile(HttpSession session , Model model){
+        User user = (User) session.getAttribute("user");
+        model.addAttribute("user", user);
+        return "Client/profile";
+    }
+    @PostMapping("/update")
+    public String updateUser(@ModelAttribute User updatedUser, HttpSession session, Model model) {
+        if(updatedUser == null) {
+            session.setAttribute("alertMessage", "Invalid credentials. Please try again.");
+        }else if (userServices.validator(updatedUser)){
+            User user = userServices.updateUser(updatedUser);
+            model.addAttribute("user", user);
+        }
+        return "Client/profile";
+    }
 }

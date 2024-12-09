@@ -1,11 +1,17 @@
 package insurancetracker.insurancetracker.service.UserService;
 
+import insurancetracker.insurancetracker.model.Contract;
+import insurancetracker.insurancetracker.model.Insurance;
 import insurancetracker.insurancetracker.model.User;
+import insurancetracker.insurancetracker.repository.ContractRepository;
+import insurancetracker.insurancetracker.repository.InsuranceRepository;
 import insurancetracker.insurancetracker.repository.UserRepository;
 import insurancetracker.insurancetracker.utils.PasswordUtils;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 @Transactional
@@ -13,6 +19,13 @@ public class UserServices {
 
     @Autowired
     private UserRepository userRepository;
+    @Autowired
+    private InsuranceRepository insuranceRepository;
+    @Autowired
+    private ContractRepository contractRepository;
+    @Autowired
+    private PasswordUtils passwordUtils;
+
 
     public User Login(String email, String password) {
         try {
@@ -27,7 +40,6 @@ public class UserServices {
         }
         return null;
     }
-
     public User Register(User user) {
         try {
             user.setPassword(PasswordUtils.hashPassword(user.getPassword()));
@@ -37,18 +49,19 @@ public class UserServices {
         }
         return null;
     }
-
+    public User updateUser(User user) {
+        User updatedUser = new User();
+        try {
+            updatedUser = userRepository.save(user);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return updatedUser;
+    }
    public long getTotalContracts(User user) {
         try {
-           return user.getHomeInsurances().stream()
-                    .filter(homeInsurance -> homeInsurance.getContract() != null)
-                    .count()
-                    + user.getCarInsurance().stream()
-                    .filter(insurance -> insurance.getContract() != null)
-                    .count()
-                    + user.getHealthInsurance().stream()
-                    .filter(insurance -> insurance.getContract() != null)
-                    .count();
+            List<Contract> contracts = contractRepository.findAll();
+            return contracts.size();
         } catch (Exception e) {
             e.printStackTrace();
             return 0;
@@ -56,17 +69,9 @@ public class UserServices {
    }
    public double totalPremium(User user) {
         try {
-            return user.getHomeInsurances().stream()
-                    .filter(homeInsurance -> homeInsurance.getContract() != null)
-                    .mapToDouble(homeInsurance -> homeInsurance.getContract().getTotal())
-                    .sum()
-                    + user.getCarInsurance().stream()
-                    .filter(insurance -> insurance.getContract() != null)
-                    .mapToDouble(insurance -> insurance.getContract().getTotal())
-                    .sum()
-                    + user.getHealthInsurance().stream()
-                    .filter(insurance -> insurance.getContract() != null)
-                    .mapToDouble(insurance -> insurance.getContract().getTotal())
+            List<Contract> contracts = contractRepository.findAll();
+            return contracts.stream()
+                    .mapToDouble(contract -> contract.getTotal())
                     .sum();
         } catch (Exception e) {
             e.printStackTrace();
@@ -80,5 +85,11 @@ public class UserServices {
             e.printStackTrace();
             return 0;
         }
+   }
+   public boolean validator(User user) {
+        if (user.getPassword()!=null && user.getPassword().length()>0 && !user.getName().isEmpty()&& !user.getName().isEmpty()&&!user.getAddress().isEmpty()&&!user.getPhone().isEmpty()) {
+            return true;
+        }
+        return false;
    }
 }

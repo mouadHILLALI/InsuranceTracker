@@ -24,11 +24,10 @@ public class User {
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private List<HealthInsurance> healthInsurance;
-
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private List<HomeInsurance> homeInsurances;
-
-
+    @Transient
+    private List<Contract> contracts;
     public User(){}
     public int getId() {
         return id;
@@ -80,5 +79,11 @@ public class User {
     }
     public List<HomeInsurance> getHomeInsurances() {
         return homeInsurances;
+    }
+    public List<Contract> getContracts() {
+        return contracts;
+    }
+    public void setContracts(List<Contract> contracts) {
+        this.contracts = contracts;
     }
 }

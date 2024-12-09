@@ -1,5 +1,10 @@
 package insurancetracker.insurancetracker.controller;
 
+import com.itextpdf.kernel.pdf.PdfDocument;
+import com.itextpdf.kernel.pdf.PdfWriter;
+import com.itextpdf.layout.Document;
+import com.itextpdf.layout.element.Paragraph;
+import com.itextpdf.pdfa.PdfADocument;
 import insurancetracker.insurancetracker.dtos.CarInsuranceDto;
 import insurancetracker.insurancetracker.dtos.ContractDto;
 import insurancetracker.insurancetracker.dtos.HealthInsuranceDto;
@@ -9,12 +14,19 @@ import insurancetracker.insurancetracker.service.ContractService.ContractService
 import insurancetracker.insurancetracker.service.InsuranceService.CarInsuranceServices;
 import insurancetracker.insurancetracker.service.InsuranceService.HealthInsuranceServices;
 import insurancetracker.insurancetracker.service.InsuranceService.HomeInsuranceServices;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+
+import java.awt.*;
+import java.io.ByteArrayOutputStream;
 import java.time.LocalDate;
+import java.util.List;
 
 @Controller
 @RequestMapping("/insurance")
@@ -31,21 +43,26 @@ public class InsuranceController {
     @GetMapping("/health")
     public String healthInsurance(Model model , HttpSession session) {
         User user = (User) session.getAttribute("user");
-        model.addAttribute("user", user);
+        session.setAttribute("user", user);
         model.addAttribute("healthInsurance", new HealthInsurance());
         return "insurance/health";
     }
     @GetMapping("/car")
     public String carInsurance(HttpSession session, Model model) {
         User user = (User) session.getAttribute("user");
-        session.setAttribute("user", user);
+        if (user == null) {
+            return "redirect:/login";
+        }
+        List<AutoInsurance> carInsurances = user.getCarInsurance();
+        model.addAttribute("carInsurances", carInsurances);
         model.addAttribute("carInsurance", new AutoInsurance());
         return "insurance/car";
     }
+
     @GetMapping("/home")
     public String homeInsurance(Model model , HttpSession session) {
         User user = (User) session.getAttribute("user");
-        model.addAttribute("user", user);
+        session.setAttribute("user", user);
         model.addAttribute("homeInsurance", new HomeInsurance());
         return "insurance/home";
     }
@@ -219,30 +236,52 @@ public class InsuranceController {
 
     }
 
-    @GetMapping("/delete/{id}/{type}")
-    public String deleteInsurance(@PathVariable(name = "id") int id , @PathVariable("type") String type, HttpSession session) {
+    @GetMapping("/display/{id}/{type}")
+    public String displayInsurance(@PathVariable(name = "id") int id , @PathVariable("type") String type, HttpSession session , Model model) {
         try {
-            switch (type){
+            switch (type) {
                 case "car":
-                    deleteCarInsurance(session , id , "car");
-                    break;
+                    return displayCarContract(id, model, session);
                 case "home":
-                    deleteHomeInsurance(session, id , "home");
+
                     break;
                 case "health":
-                    deleteHealthInsurance(session , id, "health");
+
                     break;
                 default:
-                    session.setAttribute("alertMessage" , "no insurance was deleted");
-                    return "redirect:/Auth/client";
+                    session.setAttribute("alertMessage", "Invalid insurance type");
+                    return "Client/client";
             }
-            return "redirect:/Auth/client";
         } catch (Exception e) {
-            session.setAttribute("alertMessage" , "no insurance was deleted");
             e.printStackTrace();
-            return "redirect:/Auth/client";
+            session.setAttribute("alertMessage", "An error occurred");
+            return "Client/client";
+        }
+        return "Client/client";
+    }
+
+
+    public String displayCarContract(int id, Model model, HttpSession session) {
+        try {
+            AutoInsurance insurance = carInsuranceServices.getInsurance(id);
+            if (insurance == null) {
+                session.setAttribute("alertMessage", "AutoInsurance not found");
+                return "Client/client";
+            }
+            Contract contract = contractServices.getContractByAutoInsuranceId(insurance.getId());
+            model.addAttribute("insurance", insurance);
+            if(contract!=null){
+                model.addAttribute("contract", contract);
+            }
+            return "insurance/carContract";
+        } catch (Exception e) {
+            e.printStackTrace();
+            session.setAttribute("alertMessage", "An error occurred while fetching the contract");
+            return "insurance/carContract";
         }
     }
+
+
     public String carContract(HttpSession session , double total , String path){
         try {
             CarInsuranceDto carInsuranceDto = (CarInsuranceDto) session.getAttribute("carInsuranceDto");
@@ -302,40 +341,34 @@ public class InsuranceController {
         }
     }
 
-    public void deleteCarInsurance(HttpSession session , int id , String type){
-        try {
-            if (contractServices.delete(id , type)){
-                session.setAttribute("alertMessage" , "Car insurance was deleted successfully");
-            }else{
-                session.setAttribute("alertMessage" , "couldn't delete car insurance");
-            }
-        } catch (Exception e) {
-            session.setAttribute("alertMessage" , "couldn't delete car insurance");
-            e.printStackTrace();
-        }
+
+    @GetMapping("/downloadPdf")
+    public ResponseEntity<byte[]> downloadPdf(@RequestParam("id") int insuranceId, HttpServletResponse response) throws Exception {
+        // Set the response headers for the PDF download
+        HttpHeaders headers = new HttpHeaders();
+        headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=insurance-details.pdf");
+        headers.add(HttpHeaders.CONTENT_TYPE, "application/pdf");
+
+        // Create the PdfWriter and PdfDocument instances
+        PdfWriter pdfWriter = new PdfWriter(response.getOutputStream());
+        PdfDocument pdfDocument = new PdfDocument(pdfWriter);
+        Document document = new Document(pdfDocument);
+
+        // Add content to the PDF
+        document.add(new Paragraph("Car Insurance Details"));
+        document.add(new Paragraph("Insurance ID: " + insuranceId));
+        document.add(new Paragraph("Policy Holder: John Doe"));
+        document.add(new Paragraph("Start Date: 01-Jan-2024"));
+        document.add(new Paragraph("End Date: 01-Jan-2025"));
+        document.add(new Paragraph("Vehicle Type: Sedan"));
+
+        // Close the document to finish writing the content
+        document.close();
+
+        // The response output stream will automatically handle the byte array and serve the file
+        return ResponseEntity.ok()
+                .headers(headers)
+                .build();  // No need to return the byte[] since the response is already being written directly
     }
-    public void deleteHomeInsurance(HttpSession session , int id, String type){
-        try {
-            if (contractServices.delete(id , type)){
-                session.setAttribute("alertMessage" , "HomeInsurance was deleted successfully");
-            }else{
-                session.setAttribute("alertMessage" , "couldn't delete homeInsurance");
-            }
-        } catch (Exception e) {
-            session.setAttribute("alertMessage" , "couldn't delete homeInsurance");
-            e.printStackTrace();
-        }
-    }
-    public void deleteHealthInsurance(HttpSession session , int id , String type){
-        try {
-            if (contractServices.delete(id , type)){
-                session.setAttribute("alertMessage" , "HealthInsurance was deleted successfully");
-            }else{
-                session.setAttribute("alertMessage" , "couldn't delete healthInsurance");
-            }
-        } catch (Exception e) {
-            session.setAttribute("alertMessage" , "couldn't delete healthInsurance");
-            e.printStackTrace();
-        }
-    }
+
 }

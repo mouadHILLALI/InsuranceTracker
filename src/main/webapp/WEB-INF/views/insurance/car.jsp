@@ -23,7 +23,7 @@
       <a href="/Auth/client" class="text-xl font-bold">InsuranceTracker</a>
     </div>
     <div>
-      <a href="/profile" class="px-4 hover:underline">Profile</a>
+      <a href="/Auth/profile"  class="px-4 hover:underline">Profile</a>
       <a href="/insurances" class="px-4 hover:underline">My Insurances</a>
       <a href="/Auth/logout" class="px-4 hover:underline">Logout</a>
     </div>
@@ -117,23 +117,22 @@
         <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Policy Number</th>
         <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Car Model</th>
         <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Expiry Date</th>
-        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Amount (MAD)</th>
         <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
       </tr>
       </thead>
       <tbody class="bg-white divide-y divide-gray-200">
-      <c:forEach var="insurance" items="${user.carInsurance}">
+      <c:forEach var="carInsurance" items="${carInsurances}">
         <tr>
-          <td class="px-6 py-4 whitespace-nowrap">${insurance.id}</td>
-          <td class="px-6 py-4 whitespace-nowrap">${insurance.vehiculeType}</td>
-          <td class="px-6 py-4 whitespace-nowrap">${insurance.endDate}</td>
-          <td class="px-6 py-4 whitespace-nowrap">${insurance.contract.total}DH</td>
+          <td class="px-6 py-4 whitespace-nowrap">${carInsurance.id}</td>
+          <td class="px-6 py-4 whitespace-nowrap">${carInsurance.vehiculeType}</td>
+          <td class="px-6 py-4 whitespace-nowrap">${carInsurance.endDate}</td>
           <td class="px-6 py-4 whitespace-nowrap">
-            <a href="/car-insurance/edit/${insurance.id}" class="text-blue-600 hover:underline">Edit</a> |
-            <a href="/insurance/delete/${insurance.id}/${"car"}" class="text-red-600 hover:underline">Delete</a>
+            <a href="/car-insurance/edit/${carInsurance.id}" class="text-blue-600 hover:underline">Edit</a> |
+            <a href="/insurance/display/${carInsurance.id}/car" class="text-red-600 hover:underline">Display</a>
           </td>
         </tr>
       </c:forEach>
+
       </tbody>
     </table>
   </div>

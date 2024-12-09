@@ -2,18 +2,19 @@ package insurancetracker.insurancetracker.service.InsuranceService;
 
 import insurancetracker.insurancetracker.dtos.HealthInsuranceDto;
 import insurancetracker.insurancetracker.model.User;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
 import java.time.LocalDate;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class HealthInsuranceServicesTest {
     HealthInsuranceServices healthInsuranceServices;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         healthInsuranceServices = Mockito.mock(HealthInsuranceServices.class);
     }
@@ -28,8 +29,7 @@ public class HealthInsuranceServicesTest {
         HealthInsuranceDto healthInsuranceDto = new HealthInsuranceDto("test" , LocalDate.EPOCH , LocalDate.now() , age ,coverageLevel, false , user);
 
         double actualPremium = healthInsuranceServices.calc(healthInsuranceDto);
-        assertEquals("The calculated health insurance premium should match the expected premium.",
-                expectedPremium, actualPremium, 0.01);
+        assertEquals(expectedPremium, actualPremium, 0.01);
     }
 
 }

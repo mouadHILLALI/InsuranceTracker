@@ -64,33 +64,13 @@
             return false;
         }
     }
-        @Transactional
-        public boolean delete(int insuranceId, String type) {
+        public Contract getContractByAutoInsuranceId(int id){
             try {
-                Contract contract = null;
-                switch (type) {
-                    case "car":
-                        contract = contractRepository.findByAutoInsurance_Id(insuranceId);
-                        break;
-                    case "health":
-                        contract = contractRepository.findByHealthInsurance_Id(insuranceId);
-                        break;
-                    case "home":
-                        contract = contractRepository.findByHomeInsurance_Id(insuranceId);
-                        break;
-                    default:
-                        return false;
-                }
-                if (contract != null) {
-                    contractRepository.delete(contract);
-                    return true;
-                } else {
-                    return false;
-                }
-            } catch (Exception e) {
+                return contractRepository.findByAutoInsuranceId(id);
+            } catch (RuntimeException e) {
                 e.printStackTrace();
-                return false;
             }
+            return null ;
         }
 
     }

@@ -43,13 +43,13 @@ public class AutoInsurance extends Insurance {
     public void setVehiculeType(String VehiculeType) {
         this.VehiculeType = VehiculeType;
     }
-    public boolean isProfessionalUse() {
+    public boolean getIsProfessionalUse() {
         return isProfessionalUse;
     }
     public void setProfessionalUse(boolean professionalUse) {
         isProfessionalUse = professionalUse;
     }
-    public boolean isHasAccidents() {
+    public boolean getHasAccidents() {
         return hasAccidents;
     }
     public void setHasAccidents(boolean hasAccidents) {

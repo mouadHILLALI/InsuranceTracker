@@ -25,14 +25,13 @@
         </div>
     </div>
 </c:if>
-<!-- Navigation Bar -->
 <nav class="bg-blue-600 p-4 text-white shadow-md">
     <div class="container mx-auto flex justify-between items-center">
         <div>
             <a href="/Auth/client" class="text-xl font-bold">InsuranceTracker</a>
         </div>
         <div>
-            <a href="/profile" class="px-4 hover:underline">Profile</a>
+            <a href="/Auth/profile" class="px-4 hover:underline">Profile</a>
             <a href="/insurances" class="px-4 hover:underline">My Insurances</a>
             <a href="/Auth/logout" class="px-4 hover:underline">Logout</a>
         </div>
@@ -65,27 +64,20 @@
             </a>
         </div>
     </div>
-
-    <!-- Stats Section -->
     <div class="mt-12 bg-white p-6 rounded-lg shadow-lg">
         <h2 class="text-2xl font-bold mb-6 text-gray-700">Your Insurance Stats</h2>
 
         <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <!-- Active Policies -->
             <div class="bg-blue-100 p-6 rounded-lg text-center shadow card">
                 <h3 class="text-3xl font-bold text-blue-600">${activeInsurances}</h3>
                 <p class="text-gray-700">Active Policies</p>
             </div>
-
-            <!-- Claims Processed -->
             <div class="bg-green-100 p-6 rounded-lg text-center shadow card">
                 <h3 class="text-3xl font-bold text-green-600">${totalContracts}</h3>
                 <p class="text-gray-700">total contracts</p>
             </div>
-
-            <!-- Total Premiums Paid -->
             <div class="bg-yellow-100 p-6 rounded-lg text-center shadow card">
-                <h3 class="text-3xl font-bold text-yellow-600">${totalPremium}</h3>
+                <h3 class="text-3xl font-bold text-yellow-600">${totalPremium}DH</h3>
                 <p class="text-gray-700">Total Premiums Paid</p>
             </div>
         </div>
